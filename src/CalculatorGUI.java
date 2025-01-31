@@ -3,8 +3,8 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class CalculatorGUI {
-    private JPanel Frame;
+public class CalculatorGUI extends JPanel {
+    private JPanel MainPanel;
     private JTextField CalculationArea;
     private JPanel CalculatorButtons;
     private JButton EqualButton;
@@ -46,20 +46,18 @@ public class CalculatorGUI {
     private JButton PercentButton;
 
     public CalculatorGUI() {
-        //Setup JFrame
-        Frame = new JFrame("Scientific Calculator");
-        Frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Frame.setSize(400,600);
-        Frame.setLayout(new GridLayout());
+        //Setup JPanel
+        MainPanel = new JPanel();
+        MainPanel.setLayout(new BorderLayout()); // BorderLayout to handle text area at the top
 
         //Calculation Display
         CalculationArea = new JTextField();
         CalculationArea.setFont(new Font("Arial", Font.BOLD, 24));
         CalculationArea.setHorizontalAlignment(JTextField.CENTER);
         CalculationArea.setEditable(false);
-        Frame.add(CalculationArea,GridLayout.CENTER);
+        MainPanel.add(CalculationArea,BorderLayout.NORTH);
 
-        //Button Panel
+        //Button Panel Panel with GridLayout
         CalculatorButtons = new JPanel();
         CalculatorButtons.setLayout(new GridLayout(6, 6));
 
@@ -72,7 +70,7 @@ public class CalculatorGUI {
                 "%", "sin(θ)", "e^x", "0", ".", "="
         };
 
-        //Add Buttons
+        //Add Buttons to the panel
         for (String text : buttons) {
             JButton button = new JButton(text);
             button.setFont(new Font("Arial", Font.BOLD, 18));
@@ -80,12 +78,37 @@ public class CalculatorGUI {
             CalculatorButtons.add(button);
         }
 
-        Frame.add(CalculatorButtons,GridLayout.CENTER);
-        Frame.setVisible(true);
+        MainPanel.add(CalculatorButtons,BorderLayout.CENTER);
+        MainPanel.setVisible(true);
     }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
+
     //Event Handling for Buttons
     private class ButtonClickListener implements ActionListener {
         @Override
+        public void actionPerformed(ActionEvent e) {
+            String command = e.getActionCommand();
 
+            if (command.equals("=")) {
+                //Placeholder for evaluation logic
+                CalculationArea.setText("Result");
+            } else if (command.equals("C")) {
+                CalculationArea.setText("");
+            } else if (command.equals("⬅")) {
+                String currentText = CalculationArea.getText();
+                if (!currentText.isEmpty()) {
+                    CalculationArea.setText(currentText.substring(0, currentText.length() - 1));
+                }
+            } else {
+                CalculationArea.setText(CalculationArea.getText() + command);
+            }
+        }
+
+        public JPanel getPanel() {
+            return MainPanel;   // Expose the JPanel for use in a JFrame or other components
+        }
     }
 }
