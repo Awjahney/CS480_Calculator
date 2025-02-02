@@ -72,6 +72,3 @@ If the expression contains invalid characters or results in errors like division
 
 ## Contributing
 Feel free to fork this repository, make improvements, and submit pull requests. If you find bugs or issues, please open an issue on the GitHub repository page.
-
-## License
-This project is licensed under the MIT License.
