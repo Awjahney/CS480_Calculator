@@ -1,3 +1,7 @@
+// Code adapted from https://github.com/BrickSigma/Java-Calculator
+// Commit by BrickSigma: https://github.com/BrickSigma/Java-Calculator/commit/665bc75e463d44770bbdbefb03b4e16127e1595b
+// License: Not Found.
+
 import java.util.Scanner;
 
 public class Main {
@@ -35,6 +39,11 @@ public class Main {
 
     // Function to evaluate a mathematical expression
     public static double evaluateExpression(String expression) throws Exception {
+        // Check if the expression contains only valid characters (digits, operators, parentheses, and functions)
+        if (!expression.matches("[0-9\\+\\-\\*/^\\(\\)\\{\\}a-zA-Z.]+")) {
+            throw new RuntimeException("Invalid characters in expression. Only digits, operators, parentheses, and functions are allowed. No Spaces.");
+        }
+
         // Call the parser to evaluate the expression directly
         return new ExpressionParser().parse(expression);
     }
@@ -82,7 +91,13 @@ public class Main {
             double x = parseFactor(expression);
             while (true) {
                 if (eat('*', expression)) x *= parseFactor(expression);
-                else if (eat('/', expression)) x /= parseFactor(expression);
+                else if (eat('/', expression)) {
+                    double divisor = parseFactor(expression);
+                    if (divisor == 0) {
+                        throw new RuntimeException("Error: Division by zero.");
+                    }
+                    x /= divisor;
+                }
                 else if (eat('^', expression)) x = Math.pow(x, parseFactor(expression));
                 else return x;
             }
@@ -99,6 +114,9 @@ public class Main {
                 // Handle parentheses by recursively parsing the expression inside them
                 x = parseExpression(expression);
                 eat(')', expression);
+            }else if (eat('{', expression)) {
+                    x = parseExpression(expression);
+                    eat('}', expression);
             } else if ((ch >= '0' && ch <= '9') || ch == '.') {
                 // Parse numbers (integer or decimal)
                 while ((ch >= '0' && ch <= '9') || ch == '.') nextChar(expression);
@@ -111,15 +129,18 @@ public class Main {
 
                 switch (func) {
                     case "sqrt":
+                        if (x < 0) throw new RuntimeException("Square root undefined for negative numbers.");
                         x = Math.sqrt(x);
                         break;
                     case "cbrt":
                         x = Math.cbrt(x);
                         break;
                     case "log":
+                        if (x <= 0) throw new RuntimeException("Logarithm undefined for non-positive values.");
                         x = Math.log10(x);
                         break;
                     case "ln":
+                        if (x <= 0) throw new RuntimeException("Logarithm undefined for non-positive values.");
                         x = Math.log(x);
                         break;
                     case "sin":
@@ -130,6 +151,18 @@ public class Main {
                         break;
                     case "tan":
                         x = Math.tan(Math.toRadians(x));
+                        break;
+                    case "cot":
+                        if (Math.tan(Math.toRadians(x)) == 0) throw new RuntimeException("Cotangent undefined (division by zero).");
+                        x = 1 / (Math.tan(Math.toRadians(x)));
+                        break;
+                    case "sec":
+                        if (Math.cos(Math.toRadians(x)) == 0) throw new RuntimeException("Secant undefined (division by zero).");
+                        x = 1 / Math.cos(Math.toRadians(x));
+                        break;
+                    case "cosec":
+                        if (Math.sin(Math.toRadians(x)) == 0) throw new RuntimeException("Cosecant undefined (division by zero).");
+                        x = 1 / Math.sin(Math.toRadians(x));
                         break;
 
                     default:
